@@ -24,7 +24,7 @@ int main(void)
   
   pSerLine = VR_SERIAL_initLine();
   VR_SERIAL_addDev(pSerLine, pClientDev);
-  VR_SERIAL_addDev(pSerLine, pServerDev);
+//   VR_SERIAL_addDev(pSerLine, pServerDev);
   
   printTitle("Start test!");  
   setStartTime();
@@ -32,12 +32,14 @@ int main(void)
   VR_SERIAL_devTx(pClientDev, MSG1, sizeof(MSG1) - 1);
   VR_SERIAL_devTx(pClientDev, MSG2, sizeof(MSG2) - 1);
   
-  while(1)
-  {
-    delay(.001f);
+  VR_SERIAL_procLineTask(pSerLine, .01f);
+  
+//   while(1)
+//   {
+//     delay(.001f);
     
-    VR_SERIAL_procLineTask(pSerLine, .001f);
-  }
+//     VR_SERIAL_procLineTask(pSerLine, .001f);
+//   }
   
   printTitle("End test!");
   return 0;
