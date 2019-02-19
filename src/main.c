@@ -3,7 +3,7 @@ Derrick Simeon
 Feb 16, 2019
 */
 
-#include "vr_serial.h"
+#include "serial_sim.h"
 #include "fancy_print.h"
 
 #include <stdio.h>
@@ -16,29 +16,29 @@ static const char MSG2[] = "Bullshit, asshole, nobody likes the tuna here!";
 
 int main(void)
 {
-  VrSerDev_t *pClientDev, *pServerDev;
-  VrSerLine_t *pSerLine;
+  SerSimDev_t *pClientDev, *pServerDev;
+  SerSimLine_t *pSerLine;
   
-  pClientDev = VR_SERIAL_initDev("client", UART_BPS);
-  pServerDev = VR_SERIAL_initDev("server", UART_BPS);
+  pClientDev = SERIAL_SIM_initDev("client", UART_BPS);
+  pServerDev = SERIAL_SIM_initDev("server", UART_BPS);
   
-  pSerLine = VR_SERIAL_initLine();
-  VR_SERIAL_addDev(pSerLine, pClientDev);
-//   VR_SERIAL_addDev(pSerLine, pServerDev);
+  pSerLine = SERIAL_SIM_initLine();
+  SERIAL_SIM_addDev(pSerLine, pClientDev);
+//   SERIAL_SIM_addDev(pSerLine, pServerDev);
   
   printTitle("Start test!");  
   setStartTime();
   
-  VR_SERIAL_devTx(pClientDev, MSG1, sizeof(MSG1) - 1);
-  VR_SERIAL_devTx(pClientDev, MSG2, sizeof(MSG2) - 1);
+  SERIAL_SIM_devTx(pClientDev, MSG1, sizeof(MSG1) - 1);
+  SERIAL_SIM_devTx(pClientDev, MSG2, sizeof(MSG2) - 1);
   
-  VR_SERIAL_procLineTask(pSerLine, .01f);
+  SERIAL_SIM_procLineTask(pSerLine, .01f);
   
 //   while(1)
 //   {
 //     delay(.001f);
     
-//     VR_SERIAL_procLineTask(pSerLine, .001f);
+//     SERIAL_SIM_procLineTask(pSerLine, .001f);
 //   }
   
   printTitle("End test!");

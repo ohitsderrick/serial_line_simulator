@@ -3,7 +3,7 @@ Derrick Simeon
 Feb 16, 2019
 */
 
-#include "vr_serial.h"
+#include "serial_sim.h"
 #include "fancy_print.h"
 
 #include <stdio.h>
@@ -11,14 +11,14 @@ Feb 16, 2019
 #include <stdlib.h>
 #include <assert.h>
 
-static VrSerPkt_t *_createPkt(const void *pSrc, int nChars);
-static void _deletePkt(VrSerPkt_t **ppPkt);
-static int _consumePktData(VrSerPkt_t *pPkt, int nChars);
-static VrSerPkt_t *_xferPktData(VrSerPkt_t **ppPkt, int nChars);
+static SerSimPkt_t *_createPkt(const void *pSrc, int nChars);
+static void _deletePkt(SerSimPkt_t **ppPkt);
+static int _consumePktData(SerSimPkt_t *pPkt, int nChars);
+static SerSimPkt_t *_xferPktData(SerSimPkt_t **ppPkt, int nChars);
 
-static VrSerPkt_t *_createPkt(const void *pSrc, int nChars)
+static SerSimPkt_t *_createPkt(const void *pSrc, int nChars)
 {
-  VrSerPkt_t *pPkt;
+  SerSimPkt_t *pPkt;
   
   assert((pSrc != NULL) && (nChars > 0));
   
@@ -31,9 +31,9 @@ static VrSerPkt_t *_createPkt(const void *pSrc, int nChars)
   return pPkt;
 }
 
-static void _deletePkt(VrSerPkt_t **ppPkt)
+static void _deletePkt(SerSimPkt_t **ppPkt)
 {
-  VrSerPkt_t *pObsPkt;
+  SerSimPkt_t *pObsPkt;
   
   assert(ppPkt != NULL);
   
@@ -43,7 +43,7 @@ static void _deletePkt(VrSerPkt_t **ppPkt)
   free(pObsPkt);
 }
 
-static int _consumePktData(VrSerPkt_t *pPkt, int nChars)
+static int _consumePktData(SerSimPkt_t *pPkt, int nChars)
 {
   void *pObsData;
   int nConsume;
@@ -75,9 +75,9 @@ static int _consumePktData(VrSerPkt_t *pPkt, int nChars)
   return nConsume;
 }
 
-static VrSerPkt_t *_xferPktData(VrSerPkt_t **ppPkt, int nChars)
+static SerSimPkt_t *_xferPktData(SerSimPkt_t **ppPkt, int nChars)
 {
-  VrSerPkt_t *pNewPkt;
+  SerSimPkt_t *pNewPkt;
   
   assert(ppPkt != NULL);
   
@@ -106,9 +106,9 @@ static VrSerPkt_t *_xferPktData(VrSerPkt_t **ppPkt, int nChars)
   return pNewPkt;
 }  
 
-VrSerDev_t *VR_SERIAL_initDev(const char *pName, int bps)
+SerSimDev_t *SERIAL_SIM_initDev(const char *pName, int bps)
 {
-  VrSerDev_t *pDev;
+  SerSimDev_t *pDev;
   
   pDev = malloc(sizeof(*pDev));
   pDev->pName = pName;
@@ -120,9 +120,9 @@ VrSerDev_t *VR_SERIAL_initDev(const char *pName, int bps)
   return pDev;
 }
 
-int VR_SERIAL_devTx(VrSerDev_t *pDev, const void *pSrc, int nChars)
+int SERIAL_SIM_devTx(SerSimDev_t *pDev, const void *pSrc, int nChars)
 {
-  VrSerPkt_t **ppPktItr;
+  SerSimPkt_t **ppPktItr;
   
   ppPktItr = &pDev->pTxQ;
   
@@ -141,9 +141,9 @@ int VR_SERIAL_devTx(VrSerDev_t *pDev, const void *pSrc, int nChars)
   return nChars;
 }
 
-VrSerLine_t *VR_SERIAL_initLine(void)
+SerSimLine_t *SERIAL_SIM_initLine(void)
 {
-  VrSerLine_t *pLine;
+  SerSimLine_t *pLine;
   
   pLine = malloc(sizeof(*pLine));
   pLine->pDevList = NULL;
@@ -151,9 +151,9 @@ VrSerLine_t *VR_SERIAL_initLine(void)
   return pLine;
 }
 
-void VR_SERIAL_addDev(VrSerLine_t *pSerLine, VrSerDev_t *pSerDev)
+void SERIAL_SIM_addDev(SerSimLine_t *pSerLine, SerSimDev_t *pSerDev)
 {
-  VrSerDev_t **ppDevItr;
+  SerSimDev_t **ppDevItr;
   
   ppDevItr = &pSerLine->pDevList;
   
@@ -165,9 +165,9 @@ void VR_SERIAL_addDev(VrSerLine_t *pSerLine, VrSerDev_t *pSerDev)
   *ppDevItr = pSerDev;
 }
 
-int _passPktString(int (*pfnPrint)(char *), VrSerPkt_t *pPkt)
+int _passPktString(int (*pfnPrint)(char *), SerSimPkt_t *pPkt)
 {
-  VrSerPkt_t *pPktItr;
+  SerSimPkt_t *pPktItr;
   char *pStr;
   int nChars = 0, nCopy = 0;
     
@@ -190,9 +190,9 @@ int _passPktString(int (*pfnPrint)(char *), VrSerPkt_t *pPkt)
   return pfnPrint(pStr);
 }
 
-void VR_SERIAL_procLineTask(VrSerLine_t *pLine, float seconds)
+void SERIAL_SIM_procLineTask(SerSimLine_t *pLine, float seconds)
 {
-  VrSerDev_t **ppDevItr;
+  SerSimDev_t **ppDevItr;
   int nChars;
   
   for(ppDevItr = &pLine->pDevList; *ppDevItr != NULL;
